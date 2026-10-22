@@ -1,0 +1,22 @@
+# Build output, produced by Scripts/build.sh and staged by Scripts/update.sh.
+build/
+*.app
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcodeproj
+*.xcworkspace
+
+# Editor
+*.swp
+*~
+.idea/
+.vscode/
