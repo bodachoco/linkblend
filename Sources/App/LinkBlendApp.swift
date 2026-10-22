@@ -46,16 +46,12 @@ struct LinkBlendApp: App {
             CommandGroup(replacing: .newItem) {}
         }
 
-        Settings {
-            SettingsView(model: model)
-        }
-
         MenuBarExtra {
             MenuBarContentView(model: model)
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: menuSymbol)
-                Text(menuTitle).font(.system(size: 11, design: .monospaced))
+                Text(menuTitle).font(.system(.subheadline, design: .monospaced))
             }
         }
         .menuBarExtraStyle(.window)

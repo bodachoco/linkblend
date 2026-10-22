@@ -37,10 +37,10 @@ struct ActivityView: View {
                         Label("Upload", systemImage: "circle.fill")
                             .foregroundStyle(Brand.teal)
                     }
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                 } else {
                     Text("Collecting samples. Rates appear here within a few seconds.")
-                        .font(.system(size: 13))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -48,22 +48,22 @@ struct ActivityView: View {
             Section {
                 if model.usageHistory.isEmpty {
                     Text("No usage recorded yet. Usage is counted while links are in the tunnel.")
-                        .font(.system(size: 13))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(model.usageHistory, id: \.day) { entry in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(entry.day)
-                                    .font(.system(size: 13, weight: .medium))
+                                    .font(.system(.body, weight: .medium))
                                 Spacer()
                                 Text(bytes(entry.total))
-                                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                    .font(.system(.body, design: .monospaced, weight: .medium))
                             }
                             Text(entry.devices.sorted(by: { $0.key < $1.key })
                                 .map { "\($0.key) \(bytes($0.value))" }
                                 .joined(separator: "  ·  "))
-                                .font(.system(size: 12, design: .monospaced))
+                                .font(.system(.callout, design: .monospaced))
                                 .foregroundStyle(.secondary)
                         }
                         .padding(.vertical, 2)
@@ -78,7 +78,7 @@ struct ActivityView: View {
                         exported = true
                     }
                     .buttonStyle(.plain)
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(.callout, weight: .medium))
                     .textCase(nil)
                     .disabled(model.usageHistory.isEmpty)
                 }

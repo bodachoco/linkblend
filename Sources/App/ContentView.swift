@@ -2,18 +2,27 @@ import SwiftUI
 
 // MARK: - Main window
 
-enum MainSection: Hashable {
+enum MainSection: String, Hashable {
     case overview
     case activity
     case developer
+    case settings
+
+    /// Switches the main window to this tab. The selection is stored in
+    /// `UserDefaults` under the same key `ContentView` reads, so the menu
+    /// bar can request a tab without sharing view state.
+    func activate() {
+        UserDefaults.standard.set(rawValue, forKey: "mainSection")
+    }
 }
 
 struct ContentView: View {
     @ObservedObject var model: LinkModel
-    @State private var selection: MainSection = .overview
-    @Environment(\.openSettings) private var openSettings
+    /// Shared with the menu bar so its Settings button can switch tabs here.
+    @AppStorage("mainSection") private var selection: MainSection = .overview
     @AppStorage("developerMode") private var developerMode = false
     @Namespace private var tabSpace
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,20 +30,13 @@ struct ContentView: View {
                 HStack(spacing: 14) {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.triangle.branch")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(.title3, weight: .bold))
                             .foregroundStyle(Brand.accent)
                             .accessibilityHidden(true)
                         Text("LinkBlend")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(.title3, weight: .semibold))
                     }
                     Spacer()
-                    Button {
-                        openSettings()
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                    .buttonStyle(.glass)
-                    .help("Settings")
                 }
 
                 HStack(spacing: 4) {
@@ -43,6 +45,7 @@ struct ContentView: View {
                     if developerMode {
                         tabButton(.developer, "Developer", "hammer")
                     }
+                    tabButton(.settings, "Settings", "gearshape")
                 }
                 .padding(4)
                 .glassEffect(.regular, in: Capsule())
@@ -60,10 +63,12 @@ struct ContentView: View {
                     ActivityView(model: model)
                 case .developer:
                     DeveloperView(model: model)
+                case .settings:
+                    SettingsView(model: model)
                 }
             }
             .transition(.opacity)
-            .animation(.easeInOut(duration: 0.2), value: currentSection)
+            .motionAnimation(.easeInOut(duration: 0.2), value: currentSection)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(minWidth: 760, idealWidth: 900, minHeight: 540, idealHeight: 640)
@@ -72,7 +77,7 @@ struct ContentView: View {
                 HStack(spacing: 8) {
                     Image(systemName: toast.isError ? "exclamationmark.circle.fill" : "checkmark.circle.fill")
                     Text(toast.text)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(.body, weight: .medium))
                 }
                 .foregroundStyle(toast.isError ? Color.red : Color.green)
                 .padding(.horizontal, 14)
@@ -83,7 +88,7 @@ struct ContentView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: model.toast?.id)
+        .motionAnimation(.spring(response: 0.35, dampingFraction: 0.85), value: model.toast?.id)
         .sheet(item: $model.mergePrompt) { prompt in
             MergePromptSheet(model: model, prompt: prompt)
         }
@@ -93,10 +98,9 @@ struct ContentView: View {
         if selection == .developer && !developerMode { return .overview }
         return selection
     }
-
     private func tabButton(_ section: MainSection, _ title: String, _ symbol: String) -> some View {
         Button {
-            withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+            Motion.run(.spring(response: 0.38, dampingFraction: 0.82), reduced: reduceMotion) {
                 selection = section
             }
         } label: {
@@ -104,7 +108,7 @@ struct ContentView: View {
                 Image(systemName: symbol)
                 Text(title)
             }
-            .font(.system(size: 13, weight: .medium))
+            .font(.system(.body, weight: .medium))
             .foregroundStyle(selection == section ? Color.primary : Color.secondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)

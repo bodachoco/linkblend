@@ -15,28 +15,28 @@ struct OverviewView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 12) {
                         Image(systemName: model.mergeEnabled ? "arrow.triangle.branch" : "arrow.triangle.merge")
-                            .font(.system(size: 22, weight: .semibold))
+                            .font(.system(.title, weight: .semibold))
                             .foregroundStyle(Brand.accent)
                             .contentTransition(.symbolEffect(.replace))
                             .accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(model.statusTitle)
-                                .font(.system(size: 22, weight: .semibold))
+                                .font(.system(.title, weight: .semibold))
                                 .contentTransition(.opacity)
                                 .accessibilityAddTraits(.isHeader)
                             Text(model.statusDetail)
-                                .font(.system(size: 13))
+                                .font(.body)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         Spacer()
                         HStack(spacing: 8) {
                             Text("Merge connections")
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.system(.body, weight: .medium))
                             Toggle("Merge connections", isOn: Binding(
                                 get: { model.mergeEnabled },
                                 set: { on in
-                                    withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+                                    Motion.run(.spring(response: 0.4, dampingFraction: 0.85), reduced: reduceMotion) {
                                         model.setMerging(on)
                                     }
                                 }
@@ -45,7 +45,7 @@ struct OverviewView: View {
                             .toggleStyle(.switch)
                         }
                     }
-                    .animation(.easeInOut(duration: 0.25), value: model.statusTitle)
+                    .motionAnimation(.easeInOut(duration: 0.25), value: model.statusTitle)
 
                     chartSlot
 
@@ -56,10 +56,10 @@ struct OverviewView: View {
                         if model.combinedPotential > 0 {
                             VStack(alignment: .trailing, spacing: 2) {
                                 Text("Potential")
-                                    .font(.system(size: 11))
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
                                 Text(rate(model.combinedPotential))
-                                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                                    .font(.system(.title3, design: .monospaced, weight: .semibold))
                                     .contentTransition(.numericText())
                             }
                         }
@@ -74,7 +74,7 @@ struct OverviewView: View {
                 }
                 if model.rows.isEmpty {
                     Text("No connections found.")
-                        .font(.system(size: 13))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
             } header: {
@@ -83,7 +83,7 @@ struct OverviewView: View {
                     Spacer()
                     Button("Test all") { model.testAll() }
                         .buttonStyle(.plain)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(.callout, weight: .medium))
                         .textCase(nil)
                         .disabled(!model.rows.contains { $0.enabled && $0.ip != nil })
                 }
@@ -181,8 +181,8 @@ struct OverviewView: View {
         }
         .frame(height: 72)
         .clipped()
-        .animation(.easeInOut(duration: 0.45), value: displayedLinkEvent?.id)
-        .animation(.easeInOut(duration: 0.45), value: model.samples.count > 1)
+        .motionAnimation(.easeInOut(duration: 0.45), value: displayedLinkEvent?.id)
+        .motionAnimation(.easeInOut(duration: 0.45), value: model.samples.count > 1)
     }
 
     private func rateStack(_ label: String, _ value: String, _ color: Color) -> some View {
@@ -191,11 +191,11 @@ struct OverviewView: View {
                 Circle().fill(color).frame(width: 7, height: 7)
                     .accessibilityHidden(true)
                 Text(label)
-                    .font(.system(size: 11))
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             Text(value)
-                .font(.system(size: 17, weight: .semibold, design: .monospaced))
+                .font(.system(.title2, design: .monospaced, weight: .semibold))
                 .contentTransition(.numericText())
         }
     }

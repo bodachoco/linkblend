@@ -10,19 +10,19 @@ struct MergePromptSheet: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 12) {
                 Image(systemName: "iphone")
-                    .font(.system(size: 22, weight: .medium))
+                    .font(.system(.title, weight: .medium))
                     .foregroundStyle(Brand.accent)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Merge \(prompt.service)?")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.system(.title2, weight: .semibold))
                     Text(model.statusDetail)
-                        .font(.system(size: 13))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                 }
             }
             Text("Merging uses \(prompt.service) together with your current connection. Nothing changes until you confirm.")
-                .font(.system(size: 13))
+                .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack {

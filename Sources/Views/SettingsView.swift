@@ -46,7 +46,7 @@ struct SettingsView: View {
                     }
                 }
                 Text("Automatic preference follows the lowest-latency healthy link.")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
@@ -72,7 +72,7 @@ struct SettingsView: View {
             Section("Developer") {
                 Toggle("Developer mode", isOn: $developerMode)
                 Text("Developer mode adds a Developer section with engine diagnostics, adapter weights, raw status, and logs.")
-                    .font(.system(size: 12))
+                    .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
@@ -87,7 +87,6 @@ struct SettingsView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 540, height: 520)
         .navigationTitle("Settings")
     }
 }

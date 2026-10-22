@@ -6,7 +6,9 @@ import AppKit
 struct MenuBarContentView: View {
     @ObservedObject var model: LinkModel
     @Environment(\.openWindow) private var openWindow
-    @Environment(\.openSettings) private var openSettings
+    // The panel is sized to its content, but it needs a floor so the
+    // widest line is not clipped at large text sizes.
+    @ScaledMetric(relativeTo: .body) private var panelWidth: Double = 300
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -14,17 +16,17 @@ struct MenuBarContentView: View {
                 Circle().fill(model.statusColor).frame(width: 8, height: 8)
                     .accessibilityHidden(true)
                 Text(model.statusTitle)
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.headline)
             }
             Text(model.statusDetail)
-                .font(.system(size: 12))
+                .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 16) {
                 Label(rate(model.totalIn), systemImage: "arrow.down")
                 Label(rate(model.totalOut), systemImage: "arrow.up")
             }
-            .font(.system(size: 12, design: .monospaced))
+            .font(.system(.callout, design: .monospaced))
 
             Divider()
 
@@ -42,7 +44,7 @@ struct MenuBarContentView: View {
                     .toggleStyle(.switch)
                     .controlSize(.mini)
                 }
-                .font(.system(size: 12))
+                .font(.callout)
                 .opacity(row.present ? 1 : 0.55)
             }
 
@@ -60,13 +62,19 @@ struct MenuBarContentView: View {
                     NSApp.activate(ignoringOtherApps: true)
                 }
                 Spacer()
-                Button("Settings…") { openSettings() }
+                Button("Settings…") {
+                    // Settings lives in the main window now, so switch that
+                    // window to the tab rather than opening a second one.
+                    MainSection.settings.activate()
+                    openWindow(id: "main")
+                    NSApp.activate(ignoringOtherApps: true)
+                }
                 Button("Quit") { NSApplication.shared.terminate(nil) }
             }
             .buttonStyle(.glass)
             .controlSize(.small)
         }
         .padding(14)
-        .frame(width: 300)
+        .frame(width: panelWidth)
     }
 }

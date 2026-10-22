@@ -15,6 +15,7 @@ struct LinkMorphView: View {
     @State private var completed = false
     @State private var ringScale: CGFloat = 0.6
     @State private var ringOpacity: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(event: LinkEventMsg) {
         self.event = event
@@ -69,7 +70,7 @@ struct LinkMorphView: View {
                         ? (isConnected ? AnyShapeStyle(Brand.gradient) : AnyShapeStyle(Color.orange))
                         : AnyShapeStyle(Color.secondary.opacity(0.85)))
                     Image(systemName: completed ? (isConnected ? "checkmark" : "xmark") : "link")
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(.subheadline, weight: .bold))
                         .foregroundStyle(.white)
                         .contentTransition(.symbolEffect(.replace))
                 }
@@ -81,7 +82,7 @@ struct LinkMorphView: View {
             .frame(width: 250, height: 44)
 
             Text(isConnected ? "\(event.service) linked" : "\(event.service) disconnected")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(.subheadline, weight: .medium))
                 .foregroundStyle(.secondary)
                 .contentTransition(.opacity)
         }
@@ -94,13 +95,23 @@ struct LinkMorphView: View {
         ZStack {
             Circle().fill(Color.primary.opacity(0.08))
             Image(systemName: symbol)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(.title3, weight: .medium))
                 .foregroundStyle(tint)
         }
         .frame(width: 40, height: 40)
     }
 
     func run() {
+        // With reduced motion, jump straight to the end state: the view is
+        // decorative and already hidden from assistive technology, so the
+        // outcome matters and the travel does not.
+        if reduceMotion {
+            progress = isConnected ? 1 : 0
+            packet = isConnected ? 1 : 0
+            completed = true
+            ringOpacity = 0
+            return
+        }
         if isConnected {
             withAnimation(.spring(response: 0.65, dampingFraction: 0.68)) { progress = 1 }
             withAnimation(.easeInOut(duration: 0.75)) { packet = 1 }

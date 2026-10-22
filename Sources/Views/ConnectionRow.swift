@@ -5,6 +5,11 @@ import SwiftUI
 struct ConnectionRow: View {
     @ObservedObject var model: LinkModel
     var row: LinkRow
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    // Rates stay right-aligned in a fixed column so the numbers do not
+    // jitter, but the column grows with the text size.
+    @ScaledMetric(relativeTo: .callout) private var rateColumnWidth: Double = 86
+    @ScaledMetric(relativeTo: .subheadline) private var testColumnWidth: Double = 64
 
     private var displayedState: String {
         if let stage = model.linkStages[row.device] {
@@ -45,20 +50,20 @@ struct ConnectionRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: row.symbol)
-                .font(.system(size: 16, weight: .medium))
+                .font(.system(.title3, weight: .medium))
                 .foregroundStyle(row.merged ? Color.green : (enabled ? Color.primary : Color.secondary))
                 .frame(width: 28)
                 .contentTransition(.symbolEffect(.replace))
-                .symbolEffect(.bounce, value: row.merged)
-                .animation(.easeInOut(duration: 0.3), value: row.merged)
+                .motionSymbolEffect(value: row.merged)
+                .motionAnimation(.easeInOut(duration: 0.3), value: row.merged)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.service)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(.body, weight: .semibold))
                 HStack(spacing: 6) {
                     Text(displayedState)
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(row.merged ? Color.green : Color.secondary)
                     if let stageIndex {
                         HStack(spacing: 3) {
@@ -81,9 +86,9 @@ struct ConnectionRow: View {
 
             if row.merged {
                 Text(rate(row.rateIn + row.rateOut))
-                    .font(.system(size: 12, design: .monospaced))
+                    .font(.system(.callout, design: .monospaced))
                     .foregroundStyle(.secondary)
-                    .frame(width: 86, alignment: .trailing)
+                    .frame(width: rateColumnWidth, alignment: .trailing)
                     .contentTransition(.numericText())
             }
 
@@ -102,9 +107,9 @@ struct ConnectionRow: View {
                 }
                 if let result = model.testResults[row.id] {
                     Text(rate(result))
-                        .font(.system(size: 11, design: .monospaced))
+                        .font(.system(.subheadline, design: .monospaced))
                         .foregroundStyle(.tertiary)
-                        .frame(width: 64, alignment: .trailing)
+                        .frame(width: testColumnWidth, alignment: .trailing)
                 }
             }
 
@@ -115,7 +120,7 @@ struct ConnectionRow: View {
             Toggle("Use \(row.service)", isOn: Binding(
                 get: { enabled },
                 set: { linked in
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                    Motion.run(.spring(response: 0.35, dampingFraction: 0.85), reduced: reduceMotion) {
                         model.setLinked(row, linked: linked)
                     }
                 }
@@ -126,6 +131,6 @@ struct ConnectionRow: View {
         }
         .padding(.vertical, 6)
         .opacity(!row.present ? 0.55 : (enabled ? 1 : 0.7))
-        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: enabled)
+        .motionAnimation(.spring(response: 0.35, dampingFraction: 0.85), value: enabled)
     }
 }

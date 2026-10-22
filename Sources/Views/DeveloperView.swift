@@ -5,6 +5,9 @@ import SwiftUI
 struct DeveloperView: View {
     @ObservedObject var model: LinkModel
     @State private var confirmRestart = false
+    // Columns grow with the text size so larger type is not clipped.
+    @ScaledMetric(relativeTo: .body) private var nameColumnWidth: Double = 150
+    @ScaledMetric(relativeTo: .callout) private var weightColumnWidth: Double = 40
 
     var body: some View {
         ScrollView {
@@ -24,7 +27,7 @@ struct DeveloperView: View {
                             .buttonStyle(.glass)
                     }
                     Text("Restart sends net-merge off. The supervisor starts it again within a few seconds, with your saved weights.")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                 }
 
@@ -79,7 +82,7 @@ struct DeveloperView: View {
                             .disabled(model.socksRunning)
                         Spacer()
                         Text(model.socksRunning ? "Running on 127.0.0.1:\(model.socksPort)" : "Off")
-                            .font(.system(size: 12))
+                            .font(.callout)
                             .foregroundStyle(.secondary)
                     }
                     HStack {
@@ -90,7 +93,7 @@ struct DeveloperView: View {
                             .disabled(!model.socksRunning)
                     }
                     Text("Apps set to use this proxy share every included connection, without the system-wide tunnel.")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                 }
 
@@ -98,15 +101,15 @@ struct DeveloperView: View {
                     ForEach(model.rows) { row in
                         HStack(spacing: 12) {
                             Text(row.service)
-                                .frame(width: 150, alignment: .leading)
+                                .frame(width: nameColumnWidth, alignment: .leading)
                             Slider(value: Binding(
                                 get: { model.weightsDraft[row.device] ?? row.weight ?? 1 },
                                 set: { model.weightsDraft[row.device] = $0 }
                             ), in: 0.25...3, step: 0.25)
                             .disabled(model.weightingMode != "manual")
                             Text(String(format: "%.2f", model.weightsDraft[row.device] ?? row.weight ?? 1))
-                                .font(.system(size: 12, design: .monospaced))
-                                .frame(width: 40, alignment: .trailing)
+                                .font(.system(.callout, design: .monospaced))
+                                .frame(width: weightColumnWidth, alignment: .trailing)
                         }
                     }
                     HStack {
@@ -116,7 +119,7 @@ struct DeveloperView: View {
                             .tint(Brand.accent)
                     }
                     Text("Higher weight sends more flows over that link. Saved to /usr/local/var/linkblend/weights.conf.")
-                        .font(.system(size: 12))
+                        .font(.callout)
                         .foregroundStyle(.secondary)
                 }
 
@@ -125,14 +128,14 @@ struct DeveloperView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             HStack {
                                 Text("\(row.service) [\(row.device)]")
-                                    .font(.system(size: 12, weight: .semibold))
+                                    .font(.system(.callout, weight: .semibold))
                                 Spacer()
                                 Text(row.merged ? "in tunnel" : "not in tunnel")
-                                    .font(.system(size: 11))
+                                    .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
                             Text("session down \(bytes(row.sessionIn)) · up \(bytes(row.sessionOut)) · peak \(rate(row.peakRate)) · failed flows \(row.failed) · IPv6 \(row.ipv6 ?? "—")")
-                                .font(.system(size: 11, design: .monospaced))
+                                .font(.system(.subheadline, design: .monospaced))
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -176,7 +179,7 @@ struct DeveloperView: View {
     private func monoText(_ text: String) -> some View {
         ScrollView {
             Text(text)
-                .font(.system(size: 11, design: .monospaced))
+                .font(.system(.subheadline, design: .monospaced))
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
