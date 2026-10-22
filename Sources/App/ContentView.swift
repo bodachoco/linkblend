@@ -89,12 +89,12 @@ struct ContentView: View {
         }
     }
 
-    var currentSection: MainSection {
+    private var currentSection: MainSection {
         if selection == .developer && !developerMode { return .overview }
         return selection
     }
 
-    func tabButton(_ section: MainSection, _ title: String, _ symbol: String) -> some View {
+    private func tabButton(_ section: MainSection, _ title: String, _ symbol: String) -> some View {
         Button {
             withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
                 selection = section

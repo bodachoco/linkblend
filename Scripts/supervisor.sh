@@ -21,12 +21,20 @@
 set -u
 
 CONF=${1:?conf dir}
-# net-merge is installed twice: the Homebrew copy (used for CLI work) and a
-# root copy at /usr/local/bin (what this supervisor runs as root). Prefer the
-# root copy, and fall back to Homebrew so a machine that only ran the Homebrew
-# install still works.
+# This script runs as root, so it must never exec a binary a normal user
+# could replace. /opt/homebrew/bin is user-writable, so the Homebrew copy is
+# only accepted when it is owned by root, and only as a fallback.
 BIN=/usr/local/bin/net-merge
-[ -x "$BIN" ] || BIN=/opt/homebrew/bin/net-merge
+if [ ! -x "$BIN" ]; then
+  FALLBACK=/opt/homebrew/bin/net-merge
+  if [ -x "$FALLBACK" ] && [ "$(stat -f %Su "$FALLBACK" 2>/dev/null)" = "root" ]; then
+    BIN=$FALLBACK
+  fi
+fi
+if [ ! -x "$BIN" ] || [ "$(stat -f %Su "$BIN" 2>/dev/null)" != "root" ]; then
+  echo "$(date '+%F %T') refusing to run: $BIN is missing or not owned by root" >>/var/log/linkblend.log
+  exit 1
+fi
 LOG=/var/log/linkblend.log
 LOCK="$CONF/supervisor.pid"
 child=""
@@ -133,6 +141,15 @@ start_child || true
 
 while true; do
   sleep 2
+
+  # update.sh cannot signal a root process without sudo, so it leaves this
+  # file instead. Exiting runs the EXIT trap, which stops the engine and
+  # removes the pid file, exactly as a TERM would.
+  if [ -f "$CONF/stop" ]; then
+    log "stop file seen; shutting down for update"
+    rm -f "$CONF/stop"
+    exit 0
+  fi
 
   if [ -z "$child" ] || ! kill -0 "$child" 2>/dev/null; then
     log "net-merge exited; restarting"

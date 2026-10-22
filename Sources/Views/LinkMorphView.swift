@@ -21,14 +21,14 @@ struct LinkMorphView: View {
         _progress = State(initialValue: event.kind == .connected ? 0 : 1)
     }
 
-    var isConnected: Bool { event.kind == .connected }
-    var deviceSymbol: String {
+    private var isConnected: Bool { event.kind == .connected }
+    private var deviceSymbol: String {
         event.symbol == "cable.connector" ? "cable.connector.horizontal" : event.symbol
     }
     /// Distance from center to each endpoint: wide apart at progress 0,
     /// close together at progress 1.
-    var reach: CGFloat { 40 + (1 - progress) * 46 }
-    var segmentWidth: CGFloat { max(0, reach - 34) }
+    private var reach: CGFloat { 40 + (1 - progress) * 46 }
+    private var segmentWidth: CGFloat { max(0, reach - 34) }
 
     var body: some View {
         VStack(spacing: 5) {
@@ -90,7 +90,7 @@ struct LinkMorphView: View {
         .onAppear(perform: run)
     }
 
-    func endpoint(_ symbol: String, tint: Color) -> some View {
+    private func endpoint(_ symbol: String, tint: Color) -> some View {
         ZStack {
             Circle().fill(Color.primary.opacity(0.08))
             Image(systemName: symbol)

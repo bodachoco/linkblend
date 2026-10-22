@@ -44,7 +44,7 @@ extension LinkModel {
         mergePrompt = nil
     }
 
-    func beginStage(_ row: LinkRow) {
+    private func beginStage(_ row: LinkRow) {
         guard linkStages[row.device] == nil else { return }
         linkStages[row.device] = row.ip == nil ? "waitingAddress" : "waitingTunnel"
         stageDeadlines[row.device] = Date().addingTimeInterval(35)
@@ -140,7 +140,7 @@ extension LinkModel {
         }
     }
 
-    func enqueueLinkEvent(_ event: LinkEventMsg, for device: String) {
+    private func enqueueLinkEvent(_ event: LinkEventMsg, for device: String) {
         let key = "\(device):\(event.kind == .connected ? "up" : "down")"
         let now = Date()
         if let last = lastLinkEventAt[key], now.timeIntervalSince(last) < 3 { return }
@@ -160,7 +160,7 @@ extension LinkModel {
     /// Active connections float to the top: in the tunnel first, then
     /// connected, then off, then not connected. When a device drops, the
     /// ones still carrying traffic move up on the next status tick.
-    func activeRank(_ row: LinkRow) -> Int {
+    private func activeRank(_ row: LinkRow) -> Int {
         if row.merged { return 0 }
         if !row.present { return 3 }
         if row.enabled && row.ip != nil { return 1 }

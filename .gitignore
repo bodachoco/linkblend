@@ -1,6 +1,7 @@
 # Build output, produced by Scripts/build.sh and staged by Scripts/update.sh.
 build/
 *.app
+/LinkBlend
 
 # macOS
 .DS_Store

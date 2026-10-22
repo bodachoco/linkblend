@@ -1,6 +1,6 @@
 import SwiftUI
-
 import AppKit
+
 // MARK: - Diagnostics and engine tuning
 
 extension LinkModel {

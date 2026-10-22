@@ -6,7 +6,7 @@ struct ConnectionRow: View {
     @ObservedObject var model: LinkModel
     var row: LinkRow
 
-    var displayedState: String {
+    private var displayedState: String {
         if let stage = model.linkStages[row.device] {
             switch stage {
             case "enabling": return "Turning on…"
@@ -27,7 +27,7 @@ struct ConnectionRow: View {
         }
     }
 
-    var stageIndex: Int? {
+    private var stageIndex: Int? {
         guard let stage = model.linkStages[row.device] else { return nil }
         switch stage {
         case "enabling": return 0

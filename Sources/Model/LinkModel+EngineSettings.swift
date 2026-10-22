@@ -6,7 +6,7 @@ extension LinkModel {
     /// Write the candidate list once. The supervisor starts net-merge with every
     /// candidate so that later plug/unplug needs no restart; linking and unlinking
     /// is done by disabling the macOS service, which leaves the tunnel intact.
-    func writeIfChanged(_ body: String, to path: String) {
+    private func writeIfChanged(_ body: String, to path: String) {
         if let data = FileManager.default.contents(atPath: path),
            String(data: data, encoding: .utf8) == body {
             return
@@ -25,7 +25,12 @@ extension LinkModel {
         ensureSupervisor()
     }
 
-    func ensureSupervisor() {
+    /// Make sure the root supervisor is running.
+    ///
+    /// The supervisor loops forever, so it is started detached with its
+    /// output discarded rather than run and captured: a captured pipe never
+    /// closes, which would wedge the shared work queue permanently.
+    private func ensureSupervisor() {
         guard Date().timeIntervalSince(lastSupervisorCheck) > 25 else { return }
         lastSupervisorCheck = Date()
         queue.async { [weak self] in
@@ -33,11 +38,11 @@ extension LinkModel {
             let running = self.run("/usr/bin/pgrep", ["-f", "linkblend-supervisor"])?
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             guard running.isEmpty else { return }
-            _ = self.run("/usr/bin/sudo", ["-n", self.supervisor, self.confDir])
+            self.spawnDetached("/usr/bin/sudo", ["-n", self.supervisor, self.confDir])
         }
     }
 
-    func writeEngineSettings() {
+    private func writeEngineSettings() {
         writeWeightsFile()
         writeIfChanged(ipv6Mode, to: "\(confDir)/ipv6")
         writeIfChanged("\(mtu)", to: "\(confDir)/mtu")

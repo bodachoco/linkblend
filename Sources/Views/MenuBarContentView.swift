@@ -1,6 +1,6 @@
 import SwiftUI
-
 import AppKit
+
 // MARK: - Menu bar panel
 
 struct MenuBarContentView: View {

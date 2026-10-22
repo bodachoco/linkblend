@@ -7,7 +7,7 @@ struct SettingsView: View {
     @State private var launchAtLogin = false
     @AppStorage("developerMode") private var developerMode = false
 
-    var version: String {
+    private var version: String {
         let short = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.3"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "4"
         return "\(short) (\(build))"

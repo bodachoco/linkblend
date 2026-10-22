@@ -33,7 +33,7 @@ extension LinkModel {
     /// Pausing unlinks every link except the preferred one: net-merge keeps running
     /// with that single adapter, so the tunnel and its open connections stay up.
     /// Resuming relinks the set that was active before the pause.
-    func toggleMerging() {
+    private func toggleMerging() {
         setMerging(pausedByUser)
     }
 
@@ -41,7 +41,7 @@ extension LinkModel {
         priority.first == row.device
     }
 
-    func refreshNow() {
+    private func refreshNow() {
         refreshServices()
         readStatus()
     }
@@ -86,7 +86,7 @@ extension LinkModel {
 
     /// Enable or disable a macOS network service. The interface disappears from
     /// net-merge's list within one rescan, without restarting the tunnel.
-    func applyLink(_ row: LinkRow, linked: Bool) {
+    private func applyLink(_ row: LinkRow, linked: Bool) {
         pendingLinks[row.device] = linked
         if let index = rows.firstIndex(where: { $0.id == row.id }) {
             rows[index].enabled = linked

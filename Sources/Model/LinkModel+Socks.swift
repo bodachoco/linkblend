@@ -1,6 +1,6 @@
 import Foundation
-
 import AppKit
+
 // MARK: - Per-app SOCKS5 proxy
 
 extension LinkModel {
@@ -8,7 +8,7 @@ extension LinkModel {
         socksRunning ? stopSocks() : startSocks()
     }
 
-    func startSocks() {
+    private func startSocks() {
         let include = rows.filter { !effectiveExcluded().contains($0.device) }.map { $0.device }
         guard !include.isEmpty else {
             showToast("No adapter is included in the engine.", isError: true)
@@ -33,8 +33,10 @@ extension LinkModel {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: netMergeList)
         process.arguments = args
-        process.standardOutput = Pipe()
-        process.standardError = Pipe()
+        // Discard the output: unread pipes fill up and block the proxy.
+        process.standardInput = FileHandle.nullDevice
+        process.standardOutput = FileHandle.nullDevice
+        process.standardError = FileHandle.nullDevice
         process.terminationHandler = { [weak self] proc in
             DispatchQueue.main.async {
                 guard let self else { return }

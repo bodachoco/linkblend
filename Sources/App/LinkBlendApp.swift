@@ -23,14 +23,14 @@ struct LinkBlendApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @StateObject private var model = LinkModel()
 
-    var menuTitle: String {
+    private var menuTitle: String {
         if model.pausedByUser { return "Paused" }
         if model.tunnelCount >= 2 { return "Merged" }
         if model.tunnelCount == 1 { return "Single" }
         return "Off"
     }
 
-    var menuSymbol: String {
+    private var menuSymbol: String {
         if model.pausedByUser { return "pause.circle.fill" }
         if model.tunnelCount >= 1 { return "arrow.triangle.branch" }
         return "exclamationmark.triangle"

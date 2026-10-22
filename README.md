@@ -168,12 +168,20 @@ Scripts/
   install.sh          one-time setup for a fresh machine
   update.sh           safe in-place update
   supervisor.sh       root supervisor installed by install.sh
+  uninstall.sh        removes the app, login item, and user data
 
 Resources/AppIcon.icns
 ```
 
 There is no Xcode project. `Scripts/build.sh` compiles every file under
 `Sources/` with `swiftc`, so adding a file needs no project change.
+
+## Uninstall
+
+`Scripts/uninstall.sh` stops the engine, removes the app and its login item,
+and deletes the user data. The three root-owned pieces stay behind on purpose,
+because deleting a sudoers rule as the user whose rule it is needs root; the
+script prints the exact `sudo rm` commands for them.
 
 `Scripts/build.sh` alone compiles and installs the app but does not create the root-side files. Use `Scripts/install.sh` on a new machine.
 

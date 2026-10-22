@@ -173,7 +173,7 @@ struct DeveloperView: View {
         }
     }
 
-    func monoText(_ text: String) -> some View {
+    private func monoText(_ text: String) -> some View {
         ScrollView {
             Text(text)
                 .font(.system(size: 11, design: .monospaced))

@@ -59,17 +59,17 @@ fi
 
 if [ "$SUP_CHANGED" = "1" ]; then
 step "Stopping supervisor and engine (supervisor changed)"
-SUP_PID=$(cat "$CONF/supervisor.pid" 2>/dev/null || true)
-if [ -n "${SUP_PID:-}" ]; then
-  sudo -n kill "$SUP_PID" 2>/dev/null || true
-fi
-if ! wait_gone 'linkblend-supervisor' 6; then
+# The supervisor runs as root, so signal it through a file it watches
+# instead of sudo kill. Exiting runs its trap, which stops the engine.
+touch "$CONF/stop" 2>/dev/null || true
+if ! wait_gone 'linkblend-supervisor' 8; then
+  SUP_PID=$(cat "$CONF/supervisor.pid" 2>/dev/null || true)
   if [ -n "${SUP_PID:-}" ]; then
-    sudo -n kill -9 "$SUP_PID" 2>/dev/null || true
+    sudo -n kill "$SUP_PID" 2>/dev/null || true
   fi
-  wait_gone 'linkblend-supervisor' 3 || true
+  wait_gone 'linkblend-supervisor' 4 || true
 fi
-if ! wait_gone 'net-merge run' 5; then
+if ! wait_gone 'net-merge run' 6; then
   /opt/homebrew/bin/net-merge off >/dev/null 2>&1 || true
   wait_gone 'net-merge run' 4 || true
 fi
@@ -84,8 +84,10 @@ if sudo -n cp "$SRC/Scripts/supervisor.sh" /usr/local/bin/linkblend-supervisor.n
   && sudo -n mv /usr/local/bin/linkblend-supervisor.new /usr/local/bin/linkblend-supervisor 2>/dev/null \
   && sudo -n chmod 755 /usr/local/bin/linkblend-supervisor 2>/dev/null; then
   echo "supervisor updated"
+elif sudo -n true 2>/dev/null; then
+  echo "could not install supervisor; run Scripts/install.sh to update it"
 else
-  echo "supervisor NOT updated (sudo unavailable); new supervisor applies at next start"
+  echo "supervisor NOT updated (no sudo); run Scripts/install.sh to update it"
 fi
 else
   step "Supervisor unchanged — engine left running"

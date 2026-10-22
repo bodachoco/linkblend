@@ -1,7 +1,7 @@
 import SwiftUI
 import Charts
-
 import AppKit
+
 // MARK: - Overview tab
 
 struct OverviewView: View {
@@ -136,7 +136,7 @@ struct OverviewView: View {
 
     /// Fixed-height slot: the chart and the merge morph crossfade inside it,
     /// so the layout never moves when either appears.
-    var chartSlot: some View {
+    private var chartSlot: some View {
         ZStack {
             VStack {
                 Spacer()
@@ -185,7 +185,7 @@ struct OverviewView: View {
         .animation(.easeInOut(duration: 0.45), value: model.samples.count > 1)
     }
 
-    func rateStack(_ label: String, _ value: String, _ color: Color) -> some View {
+    private func rateStack(_ label: String, _ value: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 5) {
                 Circle().fill(color).frame(width: 7, height: 7)

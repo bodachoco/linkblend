@@ -1,6 +1,6 @@
 import SwiftUI
-
 import AppKit
+
 // MARK: - Status text, rates, usage history
 
 extension LinkModel {
@@ -109,9 +109,5 @@ extension LinkModel {
         if let data = try? JSONEncoder().encode(usage) {
             try? data.write(to: usageURL)
         }
-    }
-
-    func previousDayKey() -> String {
-        Self.dayFormatter.string(from: Date().addingTimeInterval(-86400))
     }
 }

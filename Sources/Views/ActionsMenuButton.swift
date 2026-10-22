@@ -33,7 +33,7 @@ struct ActionsMenuButton: NSViewRepresentable {
         applyIcon(to: button)
     }
 
-    func applyIcon(to button: NSButton) {
+    private func applyIcon(to button: NSButton) {
         button.image = NSImage(systemSymbolName: "ellipsis.circle",
                                accessibilityDescription: "More actions")
         button.contentTintColor = .secondaryLabelColor

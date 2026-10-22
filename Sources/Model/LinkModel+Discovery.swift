@@ -18,7 +18,7 @@ extension LinkModel {
 
     /// Interfaces that exist on this Mac right now, read in-process so
     /// discovery does not spawn a tool just to answer presence.
-    func presentDevices() -> Set<String> {
+    private func presentDevices() -> Set<String> {
         var head: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&head) == 0, let first = head else { return [] }
         defer { freeifaddrs(first) }
@@ -31,7 +31,7 @@ extension LinkModel {
         return names
     }
 
-    func apply(services: [(service: String, hardware: String, device: String)]) {
+    private func apply(services: [(service: String, hardware: String, device: String)]) {
         let present = presentDevices()
         var updated: [LinkRow] = []
         for s in services {
@@ -91,7 +91,7 @@ extension LinkModel {
         }
     }
 
-    func detectServices() -> [(service: String, hardware: String, device: String)] {
+    private func detectServices() -> [(service: String, hardware: String, device: String)] {
         let out = run("/usr/sbin/networksetup", ["-listnetworkserviceorder"]) ?? ""
         var result: [(String, String, String)] = []
         let lines = out.components(separatedBy: .newlines)
@@ -114,27 +114,27 @@ extension LinkModel {
         return result
     }
 
-    func serviceEnabled(_ name: String) -> Bool {
+    private func serviceEnabled(_ name: String) -> Bool {
         let out = run("/usr/sbin/networksetup", ["-getnetworkserviceenabled", name])?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         return out != "Disabled"
     }
 
-    func interfaceIP(_ device: String) -> String? {
+    private func interfaceIP(_ device: String) -> String? {
         let out = run("/usr/sbin/ipconfig", ["getifaddr", device])?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard let out, !out.isEmpty else { return nil }
         return out
     }
 
-    func gateway(_ device: String) -> String? {
+    private func gateway(_ device: String) -> String? {
         let out = run("/usr/sbin/ipconfig", ["getoption", device, "router"])?
             .trimmingCharacters(in: .whitespacesAndNewlines)
         guard let out, !out.isEmpty else { return nil }
         return out
     }
 
-    func interfaceSubnet(_ device: String) -> String? {
+    private func interfaceSubnet(_ device: String) -> String? {
         guard let out = run("/usr/sbin/ifconfig", [device]) else { return nil }
         guard let range = out.range(of: #"inet (\d+\.\d+\.\d+\.\d+) netmask 0x([0-9a-f]+)"#,
                                     options: .regularExpression) else { return nil }
@@ -146,7 +146,7 @@ extension LinkModel {
         return "\(network)/\(mask)"
     }
 
-    func ipToUInt(_ ip: String) -> UInt32? {
+    private func ipToUInt(_ ip: String) -> UInt32? {
         let parts = ip.split(separator: ".").compactMap { UInt32($0) }
         guard parts.count == 4 else { return nil }
         return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]

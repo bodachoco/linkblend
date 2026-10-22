@@ -1,6 +1,4 @@
 import SwiftUI
-import Charts
-import AppKit
 import Foundation
 
 // MARK: - Engine state and the polling loop
@@ -46,8 +44,8 @@ final class LinkModel: ObservableObject {
     let confDir = "/usr/local/var/linkblend"
     let terminalNotifier = "/opt/homebrew/bin/terminal-notifier"
 
-    var timer: Timer?
-    var ticks = 0
+    private var timer: Timer?
+    private var ticks = 0
     var lastSeen: Set<String> = []
     var lastBytes: [String: Double] = [:]
     var usage: [String: [String: Double]] = [:]
@@ -59,11 +57,11 @@ final class LinkModel: ObservableObject {
     var publicCache: [String: String] = [:]
     var pendingLinks: [String: Bool] = [:]
     var lastSupervisorCheck = Date.distantPast
-    var limitNotified: Set<String> = []
+    private var limitNotified: Set<String> = []
     /// While a connection action popover is open, live updates pause so the
     /// popover cannot flicker or lose selection mid-tap.
     var interactionHold = false
-    var toastDismissWork: DispatchWorkItem?
+    private var toastDismissWork: DispatchWorkItem?
     var autoOffTask: Task<Void, Never>?
     var socksProcess: Process?
     var previousActiveDevices: Set<String>?
@@ -211,7 +209,7 @@ final class LinkModel: ObservableObject {
         }
     }
 
-    func addUsage(device: String, bytes: Double) {
+    private func addUsage(device: String, bytes: Double) {
         let key = dayKey()
         var per = usage[key] ?? [:]
         if let prev = lastBytes[device] {
