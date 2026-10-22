@@ -26,7 +26,7 @@ The macOS 26 SDK is required. The interface uses Liquid Glass (`glassEffect`) an
 ## Install
 
 ```bash
-git clone https://github.com/<you>/linkblend.git
+git clone https://github.com/bodachoco/linkblend.git
 cd linkblend
 ./Scripts/install.sh        # one-time setup
 ./Scripts/build.sh          # or just build and install the app
@@ -59,7 +59,7 @@ The script never touches network services, routes, or DNS.
 
 ## Use
 
-Open LinkBlend from **Applications** or the menu bar. The window has three tabs.
+Open LinkBlend from **Applications** or the menu bar. The window has four tabs: **Overview**, **Activity**, **Settings**, and a **Developer** tab that appears when you turn on developer mode.
 
 ### Overview
 
@@ -80,13 +80,17 @@ Connections sort with the active ones on top. When a device disconnects, the rem
 
 Throughput over time, plus per-day usage for the last 30 days. **Export CSV** copies the history.
 
+### Settings
+
+Everything configurable lives on one tab: open at login, notifications, merging behaviour, adapter weighting, and the merge timeout. Developer mode is here too.
+
 ### Developer
 
-Enable it in **Settings → Developer**. It adds engine diagnostics: raw status JSON, logs, adapter weights, include/exclude lists, tunneling options, the SOCKS5 proxy, and the Go profiler.
+Turn on **Settings → Developer** to reveal this tab. It adds engine diagnostics: raw status JSON, logs, adapter weights, include/exclude lists, tunneling options, the SOCKS5 proxy, and the Go profiler.
 
 ### Engine settings
 
-Available under **Settings → Engine** and **Developer**:
+Available on **Settings** and **Developer**:
 
 | Setting | Options | Default |
 | --- | --- | --- |
@@ -159,9 +163,12 @@ Sources/
   Services/     Autostart.swift          login item
   Support/      Brand.swift              colours
                 Formatting.swift         rate and byte formatting
+                Motion.swift             animations that respect reduce motion
   Views/        OverviewView, ActivityView, DeveloperView, SettingsView,
                 MenuBarContentView, ConnectionRow, LinkMorphView,
                 MergePromptSheet, ActionsMenuButton
+                (SettingsView renders inside the main window, not a
+                separate window)
 
 Scripts/
   build.sh            compiles Sources/ and packages LinkBlend.app
